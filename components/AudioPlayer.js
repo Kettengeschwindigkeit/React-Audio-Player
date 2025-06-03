@@ -14,18 +14,15 @@ const AudioPlayer = () => {
   const progressBar = useRef();
   const animationRef = useRef();
 
-  const togglePlayPause = () => {
-    const prevValue = isPlaying;
 
-    setIsPlaying(!prevValue);
+  const backThirty = () => {
+    progressBar.current.value = Number(progressBar.current.value) - 30;
+    changeRange();
+  };
 
-    if (!prevValue) {
-      audioPlayer.current.play();
-      animationRef.current = requestAnimationFrame(whilePlaying);
-    } else {
-      audioPlayer.current.pause();
-      cancelAnimationFrame(animationRef.current);
-    }
+  const forwardThirty = () => {
+    progressBar.current.value = Number(progressBar.current.value) + 30;
+    changeRange();
   };
 
   const calculateTime = (secs) => {
@@ -48,6 +45,20 @@ const AudioPlayer = () => {
     changePlayerCurrentTime();
   };
 
+  const togglePlayPause = () => {
+    const prevValue = isPlaying;
+
+    setIsPlaying(!prevValue);
+
+    if (!prevValue) {
+      audioPlayer.current.play();
+      animationRef.current = requestAnimationFrame(whilePlaying);
+    } else {
+      audioPlayer.current.pause();
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+
   const whilePlaying = () => {
     progressBar.current.value = audioPlayer.current.currentTime;
     changePlayerCurrentTime();
@@ -66,7 +77,7 @@ const AudioPlayer = () => {
     <div className={styles.audioPlayer}>
       <audio ref={audioPlayer} src="https://moosic.my.mail.ru/file/f252ab577ebb48746966230658656d91.mp3"
              preload="metadata"></audio>
-      <button className={styles.forwardBackward}>
+      <button className={styles.forwardBackward} onClick={backThirty}>
         <BsArrowLeftShort /> 30
       </button>
       <button
@@ -75,7 +86,7 @@ const AudioPlayer = () => {
       >
         {isPlaying ? <FaPause /> : <FaPlay className={styles.play} />}
       </button>
-      <button className={styles.forwardBackward}>
+      <button className={styles.forwardBackward} onClick={forwardThirty}>
         <BsArrowRightShort /> 30
       </button>
 
