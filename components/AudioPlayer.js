@@ -8,8 +8,10 @@ import { FaPause } from "react-icons/fa";
 const AudioPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
   const audioPlayer = useRef();
+  const progressBar = useRef();
 
   const togglePlayPause = () => {
     const prevValue = isPlaying;
@@ -33,10 +35,18 @@ const AudioPlayer = () => {
     return `${returnedMinutes}:${returnedSeconds}`;
   };
 
+  const changeRange = () => {
+    audioPlayer.current.currentTime = progressBar.current.value;
+    progressBar.current.style.setProperty("--seek-before-width", `${progressBar.current.value / duration * 100}%`);
+    setCurrentTime(progressBar.current.value);
+  };
+
   useEffect(() => {
     const seconds = Math.floor(audioPlayer.current.duration);
 
     setDuration(seconds);
+
+    progressBar.current.max = seconds;
   }, [audioPlayer?.current?.loadedmetadata, audioPlayer?.current?.readyState]);
 
   return (
@@ -57,11 +67,11 @@ const AudioPlayer = () => {
       </button>
 
       {/* current time */}
-      <div className={styles.currentTime}>0:00</div>
+      <div className={styles.currentTime}>{calculateTime(currentTime)}</div>
 
       {/* progress bar */}
       <div>
-        <input type="range" className={styles.progressBar} />
+        <input type="range" className={styles.progressBar} defaultValue="0" ref={progressBar} onChange={changeRange} />
       </div>
 
       {/* duration */}
