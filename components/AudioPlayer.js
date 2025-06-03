@@ -12,6 +12,7 @@ const AudioPlayer = () => {
 
   const audioPlayer = useRef();
   const progressBar = useRef();
+  const animationRef = useRef();
 
   const togglePlayPause = () => {
     const prevValue = isPlaying;
@@ -20,8 +21,10 @@ const AudioPlayer = () => {
 
     if (!prevValue) {
       audioPlayer.current.play();
+      animationRef.current = requestAnimationFrame(whilePlaying);
     } else {
       audioPlayer.current.pause();
+      cancelAnimationFrame(animationRef.current);
     }
   };
 
@@ -35,10 +38,20 @@ const AudioPlayer = () => {
     return `${returnedMinutes}:${returnedSeconds}`;
   };
 
-  const changeRange = () => {
-    audioPlayer.current.currentTime = progressBar.current.value;
+  const changePlayerCurrentTime = () => {
     progressBar.current.style.setProperty("--seek-before-width", `${progressBar.current.value / duration * 100}%`);
     setCurrentTime(progressBar.current.value);
+  };
+
+  const changeRange = () => {
+    audioPlayer.current.currentTime = progressBar.current.value;
+    changePlayerCurrentTime();
+  };
+
+  const whilePlaying = () => {
+    progressBar.current.value = audioPlayer.current.currentTime;
+    changePlayerCurrentTime();
+    animationRef.current = requestAnimationFrame(whilePlaying);
   };
 
   useEffect(() => {
